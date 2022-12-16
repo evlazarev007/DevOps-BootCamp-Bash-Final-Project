@@ -5,23 +5,23 @@ readonly currentVersion="0.0.1"
 # Function for upload files
 upload()
 {
-  for i in "$@"; do
-    echo "Uploading $i"
-    local response=$(curl --progress-bar --upload-file "$i" "https://transfer.sh/$i") || { echo "Failure!"; return 1;}
-    echo "Transfer File URL: $response"
+  for file in "$@"; do
+    echo "Uploading $file"
+    response=$(curl --progress-bar --upload-file "$file" "https://transfer.sh/$file")
+    echo "Transfer File URL: ""$response"
   done;
 }
 
 # Function for download single file
 singleDowload () {
-  local path=$(echo "$1" | sed 's:/*$::')
+  local path="$1"
   local id="$2"
   local file="$3"
   if [[ ! -d "$path"  ]]; then
     mkdir -p "$path"
   fi
   echo "Downloading $file"
-  downresponse=$(curl --progress-bar "https://transfer.sh/$id/$file" -o "$path/$file")
+  curl --progress-bar "https://transfer.sh/$id/$file" -o "$path/$file"
   if [[ -f "$path/$file" ]]; then
     printDownloadResponse
   fi
@@ -46,6 +46,15 @@ help () {
 EOF
 }
 
+# Check incoming paramters. If exist then upload runs, else help shows
+main () {
+if [[ -f "$1"  ]]; then
+  upload "$@"
+elif [[ "$#" -eq 0 ]]; then
+  help
+fi
+}
+
 # Flags functionality
 while getopts "dvh" arg; do
 case "${arg}" in
@@ -61,12 +70,9 @@ case "${arg}" in
   h)
     help
   ;;
+  *) echo "Invalid flag"
+  ;;
 esac
 done
 
-# Check incoming paramters. If exist then upload runs, else help shows
-if [[ -f "$1"  ]]; then
-  upload "$@"
-elif [[ "$#" -eq 0 ]]; then
-  help
-fi
+main "$@"
