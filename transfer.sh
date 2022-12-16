@@ -1,13 +1,15 @@
 #!/bin/bash
 
-readonly currentVersion="0.0.1"
+readonly currentVersion="1.23.0"
 
 # Function for upload files
 upload()
 {
-  for file in "$@"; do
+  for i in "$@"; do
+    file="${i#*/}"
+    path="$PWD/${i%/*}"
     echo "Uploading $file"
-    response=$(curl --progress-bar --upload-file "$file" "https://transfer.sh/$file")
+    response=$(curl --progress-bar --upload-file "$path/$file" "https://transfer.sh/$file")
     echo "Transfer File URL: ""$response"
   done;
 }
@@ -48,10 +50,10 @@ EOF
 
 # Check incoming paramters. If exist then upload runs, else help shows
 main () {
-  if [[ -f "$1"  ]]; then
-    upload "$@"
-  elif [[ "$#" -eq 0 ]]; then
+  if [[ "$#" -eq 0 ]]; then
     help
+  else
+    upload "$@"
   fi
 }
 
