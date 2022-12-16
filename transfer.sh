@@ -48,11 +48,11 @@ EOF
 
 # Check incoming paramters. If exist then upload runs, else help shows
 main () {
-if [[ -f "$1"  ]]; then
-  upload "$@"
-elif [[ "$#" -eq 0 ]]; then
-  help
-fi
+  if [[ -f "$1"  ]]; then
+    upload "$@"
+  elif [[ "$#" -eq 0 ]]; then
+    help
+  fi
 }
 
 # Flags functionality
